@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herbalife AI Wellness Coach</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="text-slate-900 flex flex-col min-h-screen">
+
+    <nav class="glass-nav sticky top-0 z-50 border-b border-slate-200/60 p-4">
+        <div class="container mx-auto max-w-2xl flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-green-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-green-200">
+                    <i class="fas fa-leaf text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-extrabold text-slate-800 tracking-tight block leading-none">Herbalife</span>
+                    <span class="text-green-600 text-[10px] font-bold uppercase tracking-[0.2em]">AI Wellness</span>
+                </div>
+            </div>
+            <div id="status-container" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 transition-all duration-500">
+                <span id="status-dot" class="w-2 h-2 bg-slate-400 rounded-full"></span>
+                <span id="status-text" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Standby</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto p-4 max-w-2xl">
+        <header id="hero-section" class="py-10 text-center space-y-4">
+            <div class="inline-block p-2 px-4 bg-green-50 text-green-700 rounded-full text-[11px] font-bold uppercase tracking-widest mb-2 border border-green-100">
+                Beta Version 2.0
+            </div>
+            <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight leading-tight">
+                Your Health, <br><span class="text-green-600 italic">AI Guided.</span>
+            </h1>
+            <p class="text-slate-500 text-sm max-w-xs mx-auto">Analyze your metrics and get a personalized Herbalife nutrition protocol in seconds.</p>
+        </header>
+
+        <section id="auth-section" class="bg-white p-8 rounded-[2rem] card-shadow border border-slate-100 transform transition-all hover:scale-[1.01]">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center text-green-700">
+                    <i class="fas fa-id-card-alt text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-800">Member Access</h2>
+                    <p class="text-xs text-slate-500">Enter your official ID to synchronize data.</p>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="relative group">
+                    <i class="fas fa-fingerprint absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-green-500 transition-colors"></i>
+                    <input type="text" id="member-id-input" 
+                           placeholder="Enter Member ID" 
+                           class="w-full p-4 pl-12 bg-slate-50 border-2 border-slate-100 rounded-2xl text-base font-semibold focus:border-green-500 focus:bg-white focus:outline-none transition-all placeholder:text-slate-300">
+                </div>
+                <button onclick="analyzeUser()" 
+                        class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl flex items-center justify-center gap-3 group active:scale-95">
+                    <span>Initialize AI Engine</span>
+                    <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </div>
+            <div id="error-box" class="mt-4 p-3 bg-red-50 rounded-xl border border-red-100 hidden">
+                <p id="error-msg" class="text-red-600 text-[11px] font-bold text-center"></p>
+            </div>
+        </section>
+
+        <div id="loading-ai" class="hidden py-16 text-center">
+            <div class="relative w-20 h-20 mx-auto mb-6">
+                <div class="absolute inset-0 border-4 border-green-100 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-t-green-600 rounded-full animate-spin"></div>
+                <i class="fas fa-brain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-green-600 text-xl float-icon"></i>
+            </div>
+            <p class="text-slate-800 font-extrabold text-lg mb-1">Synthesizing Profile...</p>
+            <p id="loading-step" class="text-slate-400 text-xs italic font-medium">Connecting to Herbalife secure servers...</p>
+        </div>
+
+        <section id="dashboard" class="hidden space-y-6 pb-24">
+            <div class="coach-gradient p-8 rounded-[2.5rem] text-white relative overflow-hidden shadow-2xl shadow-green-200">
+                <div class="relative z-10">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/30">Verified Profile</span>
+                            </div>
+                            <h2 id="user-name" class="text-3xl font-extrabold tracking-tight mb-1 leading-none">---</h2>
+                            <p id="user-id-display" class="text-green-100 text-[11px] font-medium opacity-80">ID: ---</p>
+                        </div>
+                        <div class="w-14 h-14 bg-white/20 backdrop-blur-lg rounded-2xl flex items-center justify-center border border-white/40">
+                             <i class="fas fa-user-circle text-3xl"></i>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 mt-10">
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/10">
+                            <p class="text-[9px] text-green-100 font-bold uppercase tracking-widest mb-1 opacity-60">Weight</p>
+                            <p id="user-weight" class="text-xl font-extrabold">--</p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/10">
+                            <p class="text-[9px] text-green-100 font-bold uppercase tracking-widest mb-1 opacity-60">BMI Score</p>
+                            <p id="user-bmi" class="text-xl font-extrabold">--</p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/10">
+                            <p class="text-[9px] text-green-100 font-bold uppercase tracking-widest mb-1 opacity-60">Target</p>
+                            <p id="user-ideal" class="text-xl font-extrabold">--</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
+                <div class="absolute -left-10 -top-10 w-40 h-40 bg-black/5 rounded-full blur-3xl"></div>
+            </div>
+
+            <div class="bg-slate-900 p-6 rounded-[2rem] border border-slate-800 shadow-xl">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center border border-green-500/30">
+                        <i class="fas fa-microchip text-green-400 text-xs"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Scientific Analysis</span>
+                </div>
+                <div class="relative">
+                    <p id="ai-feedback" class="text-sm text-slate-100 leading-relaxed font-medium">Consulting AI algorithms...</p>
+                    <div class="mt-4 pt-4 border-t border-slate-800/50 flex items-center justify-between">
+                        <div id="bmi-label" class="text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">Status: ---</div>
+                        <i class="fas fa-quote-right text-slate-800 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-200/50 p-1.5 rounded-2xl flex gap-1 border border-slate-200/50">
+                <button id="btn-diet" onclick="showTab('diet')" class="flex-1 py-3 rounded-xl font-bold transition-all text-xs flex items-center justify-center gap-2 tab-active">
+                    <i class="fas fa-utensils text-[10px]"></i> AI Protocol
+                </button>
+                <button id="btn-habits" onclick="showTab('habits')" class="flex-1 py-3 rounded-xl font-bold transition-all text-xs flex items-center justify-center gap-2 text-slate-500">
+                    <i class="fas fa-tint text-[10px]"></i> Wellness
+                </button>
+            </div>
+
+            <div id="view-diet" class="space-y-4"></div>
+
+            <div id="view-habits" class="hidden space-y-4">
+                <div class="bg-white p-8 rounded-[2rem] card-shadow border border-slate-100">
+                    <div class="flex justify-between items-end mb-8">
+                        <div>
+                            <h3 class="text-xl font-extrabold text-slate-800">Daily Hydration</h3>
+                            <p class="text-[11px] text-slate-400 font-medium">Goal: 4.0 Liters per day</p>
+                        </div>
+                        <div class="text-right">
+                            <span id="water-text" class="text-2xl font-black text-blue-600 block">0.00</span>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Liters Logged</span>
+                        </div>
+                    </div>
+                    
+                    <div class="relative h-4 bg-slate-100 rounded-full overflow-hidden mb-8 border border-slate-200">
+                        <div id="water-progress-bar" class="absolute top-0 left-0 h-full bg-blue-500 transition-all duration-1000 shadow-[0_0_15px_rgba(59,130,246,0.5)]" style="width: 0%"></div>
+                    </div>
+
+                    <div id="water-grid" class="grid grid-cols-8 gap-2 mb-8"></div>
+
+                    <button onclick="addWater()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-sm shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3">
+                        <i class="fas fa-plus-circle"></i>
+                        Add 250ml Glass
+                    </button>
+                </div>
+
+                <div class="bg-white p-8 rounded-[2rem] card-shadow border border-slate-100">
+                    <h3 class="text-xl font-extrabold text-slate-800 mb-6 flex items-center gap-2">
+                        <span class="w-2 h-8 bg-green-500 rounded-full"></span>
+                        Coach Advice
+                    </h3>
+                    <div class="space-y-4" id="habits-list"></div>
+                </div>
+
+                <div class="bg-white p-8 rounded-[2rem] card-shadow border border-slate-100">
+                    <h3 class="text-xl font-extrabold text-slate-800 mb-6 flex items-center gap-2">
+                        <span class="w-2 h-8 bg-indigo-500 rounded-full"></span>
+                        Routine & Tasks Tracker
+                    </h3>
+                    <p class="text-[11px] text-slate-500 mb-5">Online Class / Herbalife Fitness Club join time: <b>6:30 AM</b> and <b>5:00 PM</b>.</p>
+                    <div class="space-y-3" id="routine-list"></div>
+                    <div class="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Progress</span>
+                        <span id="task-progress-text" class="text-sm font-extrabold text-indigo-600">0%</span>
+                    </div>
+                    <div class="mt-3 h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                        <div id="task-progress-bar" class="h-full bg-indigo-500 transition-all duration-500" style="width:0%"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <button onclick="resetApp()" class="w-full py-4 text-slate-400 text-[11px] font-bold uppercase tracking-[0.2em] hover:text-slate-600 transition-colors">
+                <i class="fas fa-sign-out-alt mr-2"></i> Reset Application State
+            </button>
+
+        </section>
+    </main>
+
+    <footer class="p-8 text-center bg-slate-50 border-t border-slate-200">
+        <p class="text-slate-400 text-[9px] uppercase font-bold tracking-[0.3em]">&copy; 2024 Herbalife Nutrition &bull; Digital Ecosystem</p>
+        <p class="text-[8px] text-slate-300 mt-2 italic px-8 leading-relaxed">Artificial Intelligence serves as a guide. Please consult with your physical coach for medical conditions.</p>
+    </footer>
+
+<script src="app.js"></script>
+
+</body>
+</html>
