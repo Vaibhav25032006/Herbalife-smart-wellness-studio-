@@ -6,34 +6,38 @@
   <title>Herbalife AI Wellness Coach</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="text-slate-900 flex flex-col min-h-screen">
-<nav class="glass-nav sticky top-0 z-50 border-b border-slate-200/60 p-4"><div class="container mx-auto max-w-2xl flex justify-between"><div class="font-extrabold">Herbalife AI Wellness</div><button id="assistant-toggle" onclick="toggleAssistant()" class="bg-slate-900 text-white px-3 py-1 rounded-lg text-xs">Pause Assistant</button></div></nav>
+<nav class="glass-nav sticky top-0 z-50 border-b border-slate-200/60 p-4"><div class="container mx-auto max-w-2xl flex justify-between"><div class="font-extrabold">Herbalife AI Wellness</div><button id="assistant-toggle" onclick="toggleAssistantListening()" class="bg-slate-900 text-white px-3 py-1 rounded-lg text-xs">Pause Listening</button></div></nav>
 <main class="flex-grow container mx-auto p-4 max-w-2xl">
 <header id="hero-section" class="py-8 text-center"><h1 class="text-3xl font-extrabold">Your Health, AI Guided</h1></header>
-<section id="auth-section" class="bg-white p-6 rounded-2xl card-shadow border"><input id="member-id-input" placeholder="Enter Member ID" class="w-full p-3 border rounded-xl mb-3" /><button onclick="analyzeUser()" class="w-full bg-slate-900 text-white p-3 rounded-xl">Initialize AI Engine</button><div id="error-box" class="hidden"><p id="error-msg"></p></div></section>
+<section id="auth-section" class="bg-white p-6 rounded-2xl card-shadow border space-y-3">
+  <input id="member-id-input" placeholder="Enter Member ID" class="w-full p-3 border rounded-xl" />
+  <p class="text-xs text-slate-500">या Herbalife Smart Wellness Studio ID Card upload करें:</p>
+  <input id="id-card-upload" type="file" accept="image/*" class="w-full p-2 border rounded-xl" />
+  <p id="ocr-status" class="text-xs text-slate-500"></p>
+  <button onclick="analyzeUser()" class="w-full bg-slate-900 text-white p-3 rounded-xl">Initialize AI Engine</button>
+  <div id="error-box" class="hidden"><p id="error-msg" class="text-xs text-red-600"></p></div>
+</section>
 <div id="loading-ai" class="hidden py-8">Loading...</div>
 <section id="dashboard" class="hidden space-y-4 pb-20">
 <div class="coach-gradient p-6 rounded-2xl text-white"><h2 id="user-name">---</h2><p id="user-id-display">---</p><div class="grid grid-cols-3 gap-2 mt-4"><div><p id="user-weight">--</p></div><div><p id="user-bmi">--</p></div><div><p id="user-ideal">--</p></div></div></div>
 <div class="bg-slate-900 p-4 rounded-2xl text-white"><p id="ai-feedback">---</p><div id="bmi-label"></div><p id="assistant-log" class="text-xs text-slate-300 mt-2">Assistant live listening...</p></div>
+<div class="bg-white p-4 rounded-2xl border"><h3 class="font-bold mb-2">AI Voice Assistant</h3><div class="flex gap-2 flex-wrap"><button onclick="stopAssistantSpeaking()" class="px-3 py-1 border rounded-lg text-xs">Stop Speaking</button><button onclick="resumeAssistantSpeaking()" class="px-3 py-1 border rounded-lg text-xs">Resume Speaking</button><button onclick="speakSavedConversation()" class="px-3 py-1 border rounded-lg text-xs">Continue Last Topic</button></div></div>
 <div class="bg-slate-200/50 p-1.5 rounded-2xl flex gap-1"><button id="btn-diet" onclick="showTab('diet')" class="flex-1 py-2 rounded-xl tab-active">AI Protocol</button><button id="btn-habits" onclick="showTab('habits')" class="flex-1 py-2 rounded-xl">Wellness</button></div>
 <div id="view-diet" class="space-y-3"></div>
 <div id="view-habits" class="hidden space-y-4">
 <div class="bg-white p-5 rounded-2xl border"><h3>Hydration</h3><span id="water-text">0.00</span><div class="h-3 bg-slate-100 rounded-full"><div id="water-progress-bar" class="h-full bg-blue-500" style="width:0%"></div></div><button onclick="addWater()" class="mt-3 bg-blue-600 text-white px-3 py-2 rounded-lg">Add 250ml</button></div>
-<div class="bg-white p-5 rounded-2xl border"><h3>AI Task Manager</h3><p class="text-xs">Online class join time: 6:30 AM & 5:00 PM</p><div class="flex gap-2 my-3"><button id="btn-daily" class="task-btn tab-active px-2 py-1 rounded-lg border" onclick="renderTasks('daily')">Daily</button><button id="btn-weekly" class="task-btn px-2 py-1 rounded-lg border" onclick="renderTasks('weekly')">Weekly</button><button id="btn-monthly" class="task-btn px-2 py-1 rounded-lg border" onclick="renderTasks('monthly')">Monthly</button></div><video id="live-camera" autoplay muted class="hidden w-full rounded-xl mb-2"></video><div id="routine-list" class="space-y-2"></div><div class="mt-3"><span id="task-progress-text">0%</span><div class="h-3 bg-slate-100 rounded-full"><div id="task-progress-bar" class="h-full bg-indigo-500" style="width:0%"></div></div></div></div>
-<div class="bg-white p-5 rounded-2xl border"><h3>Calendar Completion</h3><div id="task-calendar" class="grid gap-2"></div></div>
+<div class="bg-white p-5 rounded-2xl border"><h3>User Type</h3><p class="text-xs mb-2">क्या आप Herbalife products use करते हैं?</p><div class="flex gap-2"><button onclick="setUserType('herbalife')" class="px-3 py-1 border rounded">Yes</button><button onclick="setUserType('general')" class="px-3 py-1 border rounded">No</button></div><p id="user-type-text" class="text-xs mt-2"></p></div>
+<div class="bg-white p-5 rounded-2xl border"><h3>AI Task Manager</h3><p class="text-xs">Online class join time: 6:30 AM & 5:00 PM</p><div class="flex gap-2 my-3 flex-wrap"><button id="btn-daily" class="task-btn tab-active px-2 py-1 rounded-lg border" onclick="renderTasks('daily')">Daily</button><button id="btn-weekly" class="task-btn px-2 py-1 rounded-lg border" onclick="renderTasks('weekly')">Weekly</button><button id="btn-monthly" class="task-btn px-2 py-1 rounded-lg border" onclick="renderTasks('monthly')">Monthly</button><button id="btn-quarterly" class="task-btn px-2 py-1 rounded-lg border" onclick="renderTasks('quarterly')">Quarterly</button><button id="btn-halfyearly" class="task-btn px-2 py-1 rounded-lg border" onclick="renderTasks('halfyearly')">Half-Yearly</button><button id="btn-yearly" class="task-btn px-2 py-1 rounded-lg border" onclick="renderTasks('yearly')">Yearly</button></div><video id="live-camera" autoplay muted class="hidden w-full rounded-xl mb-2"></video><div id="routine-list" class="space-y-2"></div><div class="mt-3"><span id="task-progress-text">0%</span><div class="h-3 bg-slate-100 rounded-full"><div id="task-progress-bar" class="h-full bg-indigo-500" style="width:0%"></div></div></div></div>
+<div class="bg-white p-5 rounded-2xl border"><h3>Calendar Completion</h3><button onclick="openCalendarConfig()" class="text-xs border px-2 py-1 rounded mb-2">Open Calendar Settings</button><div id="calendar-config" class="hidden mb-2"><input type="date" id="skip-date" class="border p-1 rounded"><button onclick="addSkipDate()" class="text-xs border px-2 py-1 rounded">Set Festival/Vacation</button></div><div id="task-calendar" class="grid gap-2"></div></div>
 <div class="bg-white p-5 rounded-2xl border"><h3>Progress Chart</h3><div id="progress-chart" class="space-y-1"></div></div>
 </div>
 </section>
 </main>
 <footer class="p-6 text-center bg-slate-50 border-t"><p class="text-xs">© 2024 Herbalife Nutrition</p><a class="text-sm text-green-700 font-bold" href="https://herbalife-smart-wellness-studio.my.canva.site/page-2" target="_blank">Go to Main Website</a></footer>
-<script src="data.js"></script>
-<script src="storage.js"></script>
-<script src="plans.js"></script>
-<script src="voice.js"></script>
-<script src="tasks.js"></script>
-<script src="ui.js"></script>
-<script src="main.js"></script>
+<script src="data.js"></script><script src="storage.js"></script><script src="plans.js"></script><script src="voice.js"></script><script src="tasks.js"></script><script src="ui.js"></script><script src="main.js"></script>
 </body>
 </html>
