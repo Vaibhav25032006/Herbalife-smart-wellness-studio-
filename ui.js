@@ -16,6 +16,8 @@ function populateData(user){
   appState.currentPlan=(user.category==='Overweight')?getWeightLossPlan():getHealthPlan();
   dietView.innerHTML=appState.currentPlan.map(item=>`<div class='bg-white p-6 rounded-[2rem] border border-slate-100 card-shadow'><p class='text-xs font-bold text-slate-400'>${item.time}</p><h4 class='text-sm font-bold text-slate-800'>${item.title}</h4><p class='text-[11px] text-slate-500'>${item.desc}</p></div>`).join('');
 
+  const userState=loadUserState();
+  document.getElementById('user-type-text').innerText=`Current mode: ${userState.userType}`;
   renderTasks('daily');
   renderCalendar();
   renderChart();
