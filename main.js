@@ -1,4 +1,4 @@
-const appState={waterCount:0,currentUser:null,currentPlan:[],voices:[],recognition:null,isListening:false,lastSpeechText:'',lastUtterance:null};
+const appState={waterCount:0,currentUser:null,currentPlan:[],voices:[],recognition:null,isListening:false,lastSpeechText:'',lastUtterance:null,awaitingUserTurn:false};
 
 async function analyzeUser(){
   const errorBox=document.getElementById('error-box');const errorMsg=document.getElementById('error-msg');
